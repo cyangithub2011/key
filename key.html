@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Script Key System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #000000, #0679DE);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 450px;
+        }
+        .container h1 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #f1f1f1;
+        }
+        .container h2 {
+            font-size: 22px;
+            color: #00FF00;
+            margin-top: 20px;
+        }
+        .container input {
+            padding: 10px;
+            font-size: 16px;
+            width: calc(100% - 22px);
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .container button {
+            padding: 12px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .container button:hover {
+            background-color: #0056b3;
+        }
+        .key-display {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #20232a;
+            border-radius: 5px;
+            color: #00FF00;
+            font-family: monospace;
+            display: none;
+            font-size: 18px;
+        }
+        #message {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        #confirmButton {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Get Your Key</h1>
+        <button onclick="redirectToAd()">Generate Key</button>
+        <div id="keyDisplay" class="key-display"></div>
+
+        <h2 id="step2Header" style="display: none;">Confirm Ad Completion</h2>
+        <button id="confirmButton" onclick="verifyAdCompletion()">Confirm</button>
+
+        <div id="message"></div>
+    </div>
+
+    <script>
+        let generatedKey = "";
+        let adVerified = false;
+
+        // Function to redirect to the ad link
+        function redirectToAd() {
+            // Hide key display elements
+            document.getElementById("keyDisplay").style.display = "none";
+            document.getElementById("step2Header").style.display = "none";
+            document.getElementById("confirmButton").style.display = "none";
+
+            // Open the ad link
+            window.open("https://example-ad-link.com", "_blank");
+            alert("Please watch the ad and return here to confirm.");
+
+            // Show confirmation button after waiting
+            setTimeout(() => {
+                document.getElementById("step2Header").style.display = "block";
+                document.getElementById("confirmButton").style.display = "inline-block";
+            }, 1000);
+        }
+
+        // Function to verify ad completion via backend API
+        async function verifyAdCompletion() {
+            const response = await fetch("/verify-ad-completion", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ userId: "unique-user-id" })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                generateKey();
+            } else {
+                document.getElementById("message").textContent = "You must watch the ad to proceed.";
+                document.getElementById("message").style.color = "red";
+            }
+        }
+
+        // Function to generate and display the key after confirmation
+        function generateKey() {
+            const randomCode = Math.random().toString(36).substring(2, 10);
+            generatedKey = `bin-${randomCode}`;
+
+            const keyDisplay = document.getElementById("keyDisplay");
+            keyDisplay.textContent = `Your Key: ${generatedKey}`;
+            keyDisplay.style.display = "block";
+        }
+    </script>
+</body>
+</html>
